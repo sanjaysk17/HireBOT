@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: HIREBOT_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/placement_db
+
+  frontend:
+    build: ./frontend
+    container_name: HIREBOTt_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  mongodb:
+    image: mongo
+    container_name: HIREBOT_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
