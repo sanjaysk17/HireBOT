@@ -6,26 +6,16 @@ services:
     container_name: HIREBOT_backend
     ports:
       - "8000:8000"
-    depends_on:
-      - mongodb
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/placement_db
+      - SUPABASE_URL=https://jgmiwgmvkpmxbwzcncql.supabase.co
+      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbWl3Z212a3BteGJ3emNuY3FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MzA0NjEsImV4cCI6MjA3NzMwNjQ2MX0._564jvTHpP4vKTA7C1oipi6cMdAOU07QW_7cPbOvAtE
+
+    # ⬆️ These go into .env ideally (not hardcoded, see below)
 
   frontend:
     build: ./frontend
-    container_name: HIREBOTt_frontend
+    container_name: HIREBOT_frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
-
-  mongodb:
-    image: mongo
-    container_name: HIREBOT_mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
