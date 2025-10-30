@@ -1,19 +1,30 @@
-# 🐍 Backend Dockerfile
+# -------------------------------------
+# HireBOT Backend - FastAPI Dockerfile
+# -------------------------------------
 
-# 1️⃣ Use official Python image
-FROM python:3.10-slim
+# Base image
+FROM python:3.11-slim
 
-# 2️⃣ Set working directory
+# Working directory
 WORKDIR /app
 
-# 3️⃣ Copy all files from backend folder
-COPY . .
+# Install system dependencies (for PostgreSQL, etc.)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# 4️⃣ Install dependencies from requirements.txt
+# Copy requirements first for caching
+COPY requirements.txt .
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5️⃣ Expose backend port
+# Copy the rest of the backend source code
+COPY . .
+
+# Expose FastAPI port
 EXPOSE 8000
 
-# 6️⃣ Run the FastAPI server
+# Default command to run app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

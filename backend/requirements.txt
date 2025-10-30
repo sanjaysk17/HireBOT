@@ -1,2 +1,13 @@
-supabase
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
 python-dotenv
+SQLAlchemy
+psycopg2-binary
+passlib[bcrypt]
+python-jose[cryptography]
+celery
+redis
+requests
+loguru

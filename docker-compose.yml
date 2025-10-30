@@ -1,21 +1,48 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
-    container_name: HIREBOT_backend
+    container_name: hirebot-backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    container_name: hirebot-db
+    restart: always
     environment:
-      - SUPABASE_URL=https://jgmiwgmvkpmxbwzcncql.supabase.co
-      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbWl3Z212a3BteGJ3emNuY3FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MzA0NjEsImV4cCI6MjA3NzMwNjQ2MX0._564jvTHpP4vKTA7C1oipi6cMdAOU07QW_7cPbOvAtE
-
-    # ⬆️ These go into .env ideally (not hardcoded, see below)
-
-  frontend:
-    build: ./frontend
-    container_name: HIREBOT_frontend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hirebot
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
-      - "3000:3000"
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: hirebot-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: ./backend
+    container_name: hirebot-worker
+    command: ["sh", "-c", "cd /app && celery -A core.tasks worker --loglevel=info"]
+
     depends_on:
       - backend
+      - redis
+    env_file:
+      - .env
+
+volumes:
+  db_data:
